@@ -10,7 +10,6 @@ module Point = struct
 end
 
 module PointMap = Map.Make (Point)
-module PointSet = Set.Make (Point)
 
 let m =
   raw |> String.split_on_char '\n' |> List.to_seq
