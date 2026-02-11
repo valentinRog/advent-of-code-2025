@@ -1,4 +1,4 @@
-let get_raw =
+let raw =
   In_channel.input_all stdin |> String.trim |> String.to_seq
   |> Seq.filter (fun c -> c != '\r')
   |> String.of_seq
@@ -17,7 +17,7 @@ let () =
         compute s (acc ^ string_of_int n)
   in
   let res =
-    get_raw |> String.split_on_char '\n'
+    raw |> String.split_on_char '\n'
     |> List.map (fun s ->
            let s =
              s |> String.to_seq

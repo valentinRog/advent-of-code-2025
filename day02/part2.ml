@@ -1,10 +1,10 @@
-let get_raw =
+let raw =
   In_channel.input_all stdin |> String.trim |> String.to_seq
   |> Seq.filter (fun c -> c != '\r')
   |> String.of_seq
 
 let data =
-  get_raw |> String.split_on_char ','
+  raw |> String.split_on_char ','
   |> List.map (fun s ->
          let l =
            s |> String.split_on_char '-' |> List.map (fun s -> int_of_string s)

@@ -36,8 +36,7 @@ let ranges =
   |> List.sort (fun (r1_0, _) (r2_0, _) -> Int64.compare r1_0 r2_0)
 
 let res =
-  let rec f n acc l =
-    match l with
+  let rec f n acc = function
     | [] -> acc
     | (n0, n1) :: tl ->
         if n >= n1 then f n acc tl
