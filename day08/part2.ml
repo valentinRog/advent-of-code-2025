@@ -38,7 +38,7 @@ let data =
   |> List.sort (fun (p11, p12) (p21, p22) ->
          Float.compare (Point.distance p11 p12) (Point.distance p21 p22))
   |> List.filteri (fun i _ -> i mod 2 = 1)
-  |> List.to_seq |> Seq.take 1000 |> List.of_seq
+  |> List.to_seq
 
 let connect (p1, p2) con =
   let f p1 p2 con =
@@ -48,7 +48,11 @@ let connect (p1, p2) con =
   in
   f p2 p1 (f p1 p2 con)
 
-let con = List.fold_left (fun acc points -> connect points acc) con data
+let make_con n =
+  List.fold_left
+    (fun acc points -> connect points acc)
+    con
+    (data |> Seq.take n |> List.of_seq)
 
 let extract_group p con =
   let rec f p acc =
@@ -67,7 +71,7 @@ let remove_network hs con =
   in
   f con (hs |> PointSet.to_seq |> List.of_seq)
 
-let networks =
+let make_networks con =
   let rec f acc con =
     if PointMap.is_empty con then acc
     else
@@ -78,8 +82,16 @@ let networks =
   f [] con
 
 let res =
-  networks |> List.map PointSet.cardinal |> List.sort Int.compare |> List.rev
-  |> List.to_seq |> Seq.take 3
-  |> Seq.fold_left (fun acc n -> n * acc) 1
+  let rec f n1 n2 =
+    let n = (n2 + n1 + 1) / 2 in
+    let con = make_con n in
+    let networks = make_networks con in
+    match List.length networks with
+    | 1 when n2 != n1 + 1 -> f n1 n
+    | 1 -> data |> Seq.take n |> List.of_seq |> List.rev |> List.hd
+    | _ -> f n n2
+  in
+  let p1, p2 = f 1 (List.of_seq data |> List.length) in
+  p1.x * p2.x
 
 let () = Printf.printf "%d\n" res
