@@ -59,21 +59,23 @@ module Problem = struct
   let bfs { light = target; buttons } =
     let rec f q seen =
       let (light, n), q = Queue.pop q in
-      let seen = IntSetSet.add light seen in
       if IntSet.equal light target then n
       else
-        let q =
+        let q, seen =
           buttons
           |> List.fold_left
-               (fun acc button ->
+               (fun (acc_q, acc_seen) button ->
                  let new_light = apply_button button light in
-                 if IntSetSet.mem new_light seen then acc
-                 else Queue.push (new_light, n + 1) acc)
-               q
+                 if IntSetSet.mem new_light acc_seen then (acc_q, acc_seen)
+                 else
+                   ( Queue.push (new_light, n + 1) acc_q,
+                     IntSetSet.add new_light acc_seen ))
+               (q, seen)
         in
         f q seen
     in
-    f (Queue.empty |> Queue.push (IntSet.empty, 0)) IntSetSet.empty
+    let initial_seen = IntSetSet.singleton IntSet.empty in
+    f (Queue.empty |> Queue.push (IntSet.empty, 0)) initial_seen
 end
 
 let res =
